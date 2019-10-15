@@ -50,8 +50,8 @@ namespace Schedule.ImageService
                 .ConfigureLogging(logging =>
                 {
                     logging.ClearProviders();
-                    logging.SetMinimumLevel(LogLevel.Information);
                 })
+                .UseUrls("http://+:5050")
                 .UseNLog();
     }
     
