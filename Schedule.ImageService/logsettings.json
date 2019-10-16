@@ -8,7 +8,7 @@
       "Default": "Verbose",
       "Override": {
         "Microsoft": "Error",
-        "System": "Debug",   
+        "System": "Error",   
         "Hangfire": "Error",
         "Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker": "Error",
         "Microsoft.AspNetCore.Mvc.Infrastructure.ObjectResultExecutor": "Error"       
