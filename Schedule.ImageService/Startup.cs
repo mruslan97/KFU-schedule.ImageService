@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
@@ -15,17 +16,55 @@ using Microsoft.Extensions.Options;
 using Schedule.ImageService.Models;
 using Schedule.ImageService.Services;
 using Schedule.ImageService.Services.Impl;
+using Serilog;
 
 namespace Schedule.ImageService
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
+        /// <summary>
+        ///     Путь к файлу конфига
+        /// </summary>
+        private readonly string ConfigPath = "appsettings.json";
+        
+        /// <summary>
+        ///     Путь к файлу настроек логгера
+        /// </summary>
+        private readonly string LogConfigPath = "logsettings.json";
 
-        public IConfiguration Configuration { get; }
+        private readonly string CorsPolicyName = "CorsPolicy";
+
+        /// <summary>
+        ///     Информация об окружении
+        /// </summary>
+        private IHostingEnvironment Env { get; }
+
+        /// <summary>
+        ///     Конфигурация приложения
+        /// </summary>
+        private IConfiguration Configuration { get; }
+
+        /// <summary>
+        ///     Инициализирует новый объект <see cref = "Startup" /> class.
+        ///     Конструктор класса
+        /// </summary>
+        /// <param name = "env" > Информация об окружении </param>
+        public Startup(IHostingEnvironment env)
+        {
+            Env = env;
+            var envConfigPath = Path.ChangeExtension(ConfigPath,
+                $".{Env.EnvironmentName}{Path.GetExtension(ConfigPath)}");
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile(ConfigPath, false, true)
+                .AddJsonFile(envConfigPath, true, true)
+                .AddJsonFile(envConfigPath, true, true)
+                .AddJsonFile(LogConfigPath, true, true)
+                .AddEnvironmentVariables();
+            
+            Configuration = builder.Build();
+        }
+        
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -36,6 +75,12 @@ namespace Schedule.ImageService
             services.AddTransient<IConverterService, ConverterService>();
             services.AddHangfire(x => x.UseMemoryStorage());
             services.AddHttpClient();
+            services.AddLogging(builder =>
+            {
+                builder.ClearProviders();
+                builder.AddSerilog(new LoggerConfiguration()
+                    .ReadFrom.Configuration(Configuration).CreateLogger());
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,0 +1,122 @@
+{
+  "Serilog": {
+    "Using": [
+      "Serilog.Sinks.Console",
+      "Serilog.Sinks.RollingFile"
+    ],
+    "MinimumLevel": {
+      "Default": "Verbose",
+      "Override": {
+        "Microsoft": "Error",
+        "System": "Debug",   
+        "Hangfire": "Error",
+        "Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker": "Error",
+        "Microsoft.AspNetCore.Mvc.Infrastructure.ObjectResultExecutor": "Error"       
+      }
+    },
+    "WriteTo": [
+      {
+        "Name": "Console",
+        "Args": {
+          "restrictedToMinimumLevel": "Debug",
+          "outputTemplate": "[{Timestamp:HH:mm:ss} {SourceContext} [{Level}] {Message}{NewLine}{Exception}"
+        }
+      },
+      {
+        "Name": "RollingFile",
+        "Args": {
+          "pathFormat": "C:/logs/all-{Date}.txt",
+          "fileSizeLimitBytes": 100000000,
+          "retainedFileCountLimit": 31,
+          "rollingInterval": "Day"
+        }
+      },
+      {
+        "Name": "Logger",
+        "Args": {
+          "configureLogger": {
+            "WriteTo": [
+              {
+                "Name": "RollingFile",
+                "Args": {
+                  "pathFormat": "C:/logs/warning/warning-{Date}.txt",
+                  "fileSizeLimitBytes": 100000000,
+                  "retainedFileCountLimit": 31,
+                  "rollingInterval": "Day"
+                }
+              }
+            ],
+            "Filter": [
+              {
+                "Name": "ByIncludingOnly",
+                "Args": {
+                  "expression": "@Level = 'Warning'"
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "Name": "Logger",
+        "Args": {
+          "configureLogger": {
+            "WriteTo": [
+              {
+                "Name": "RollingFile",
+                "Args": {
+                  "pathFormat": "C:/logs/info/info-{Date}.txt",
+                  "fileSizeLimitBytes": 100000000,
+                  "retainedFileCountLimit": 31,
+                  "rollingInterval": "Day"
+                }
+              }
+            ],
+            "Filter": [
+              {
+                "Name": "ByIncludingOnly",
+                "Args": {
+                  "expression": "@Level = 'Information'"
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "Name": "Logger",
+        "Args": {
+          "configureLogger": {
+            "WriteTo": [
+              {
+                "Name": "RollingFile",
+                "Args": {
+                  "pathFormat": "C:/logs/error/error-{Date}.txt",
+                  "fileSizeLimitBytes": 100000000,
+                  "retainedFileCountLimit": 31,
+                  "rollingInterval": "Day"
+                }
+              }
+            ],
+            "Filter": [
+              {
+                "Name": "ByIncludingOnly",
+                "Args": {
+                  "expression": "@Level = 'Error'"
+                }
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "Enrich": [
+      "FromLogContext",
+      "WithMachineName",
+      "WithThreadId"
+    ],
+    "Properties": {
+      "Application": "Vehicles"
+    }
+  }
+}

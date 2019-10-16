@@ -9,7 +9,6 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using NLog.Web;
 using Schedule.ImageService.Services;
 
 namespace Schedule.ImageService
@@ -47,12 +46,8 @@ namespace Schedule.ImageService
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
-                .ConfigureLogging(logging =>
-                {
-                    logging.ClearProviders();
-                })
-                .UseUrls("http://+:5050")
-                .UseNLog();
+                .UseUrls("http://+:5050");
+
     }
     
     public static class WebHostServiceExtensions
